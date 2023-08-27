@@ -1,0 +1,18 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var rent_1 = require("./rent");
+var bicycle_1 = require("./bicycle");
+var person_1 = require("./person");
+var personID = "40028922";
+var personName = "Julia";
+var bicycleID = "42424242";
+var dayRentValue = 10;
+var rentInitialDate = new Date(2023, 8, 1);
+var rentLastDate = new Date(2023, 8, 10);
+var person = new person_1.Person(personID, personName);
+var bicycle = new bicycle_1.Bicycle(bicycleID, dayRentValue);
+var rent1 = new rent_1.Rent(person, bicycle, rentInitialDate, rentLastDate);
+rent1.getRentDays();
+rent1.getBill();
+console.log("days rented: ", rent1.rentDays + 1);
+console.log("bill: ", rent1.bill);

@@ -1,1 +1,1 @@
-# Typescript for Object-Oriented Programming
+# programming_typescript
