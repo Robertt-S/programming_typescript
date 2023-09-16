@@ -23,8 +23,6 @@ export class App {
     }
 
 
-
-
     registerBike(bike: Bike): void {
         for (const rBike of this.bikes) {
             if (rBike.name === bike.name) {
@@ -34,7 +32,7 @@ export class App {
         bike.id = crypto.randomUUID()
         this.bikes.push(bike)
     }
-    
+
 
     removeUser(userEmail: string): void {
         for (let elementIndex = 0; elementIndex < this.users.length; elementIndex++) {
@@ -56,34 +54,11 @@ export class App {
 
     bikeReturn(userEmail: string, dateFrom: Date, dateTo: Date, dateReturned: Date) {
         for (let rentIndex = 0; rentIndex < this.rents.length; rentIndex++) {
-            if (userEmail === this.rents[rentIndex].user.email  &&
-                dateFrom === this.rents[rentIndex].dateFrom  &&
+            if (userEmail === this.rents[rentIndex].user.email &&
+                dateFrom === this.rents[rentIndex].dateFrom &&
                 dateTo === this.rents[rentIndex].dateTo) {
-                    this.rents[rentIndex].dateReturned = dateReturned
+                this.rents[rentIndex].dateReturned = dateReturned
             }
-        }
-    }
-
-
-
-    // 4
-    listUsers(users: User[]) {
-        for (const user of users) {
-            console.log(user.id, user.name)
-        }
-    }
-
-
-    listRents(rents: Rent[]) {
-        for (const rent of rents) {
-            console.log(rent.user, rent.dateFrom, rent.dateTo, rent.dateReturned)
-        }
-    }
-
-
-    listBikes(bikes: Bike[]) {
-        for (const bike of bikes) {
-            console.log(bike.id, bike.name)
         }
     }
 }
