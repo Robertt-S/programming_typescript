@@ -92,7 +92,20 @@ export class App {
     listRents(): Rent[] {
         return this.rents
     }
+
+
+
+
+    setBikeLocation(id: string, latitude: number, longitude: number): void {
+        for (const bike of this.bikes) {
+            if (id === bike.id) {
+                bike.latitude = latitude
+                bike.longitude = longitude
+            }
+        }
+    }
 }
+
 
 function diffHours(dt2: Date, dt1: Date) {
   var diff = (dt2.getTime() - dt1.getTime()) / 1000;
