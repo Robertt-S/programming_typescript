@@ -6,6 +6,9 @@ import { Location } from "./location"
 import { BikeNotFoundError } from "./errors/bike-not-found-error"
 import { UnavailableBikeError } from "./errors/unavailable-bike-error"
 import { UserNotFoundError } from "./errors/user-not-found-error"
+import { DupicatedUser } from "./errors/duplicated-user"
+import { UserNotFound } from "./errors/user-not-found"
+import { UserDoesntExist } from "./errors/user-doesnt-exist"
 
 describe('App', () => {
     it('should correctly calculate the rent amount', async () => {
@@ -74,5 +77,44 @@ describe('App', () => {
         expect(() => {
             app.findUser('fake@mail.com')
         }).toThrow(UserNotFoundError)
+    })
+
+
+
+
+    it('should throw error: duplicated user', async () => {
+        const app = new App()
+        const user = new User('Bobby', 'robert@mail.com', '42424242', '24242424')
+
+        app.registerUser(user)
+
+        expect(() => {
+            app.registerUser(user)
+        }).toThrow(DupicatedUser)
+    })
+
+    
+    it('should throw error: User not found!', async () => {
+        const app = new App()
+        const user = new User('Bobby', 'robert@mail.com', '42424242', '24242424')
+
+        expect(() => {
+            app.findUser(user.email)
+        }).toThrow(UserNotFound)
+    })
+
+
+
+
+
+
+
+    it("should throw error: User doesn't exist!", () => {
+        const app = new App()
+        const user = new User('Bobby', 'robert@mail.com', '42424242', '24242424')
+
+        expect(() => {
+            app.removeUser(user.email)
+        }).toThrow(UserDoesntExist)
     })
 })
