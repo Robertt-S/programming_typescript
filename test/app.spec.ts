@@ -6,14 +6,14 @@ import { Location } from "../src/location"
 import { BikeNotFoundError } from "../src/errors/bike-not-found-error"
 import { UnavailableBikeError } from "../src/errors/unavailable-bike-error"
 import { UserNotFoundError } from "../src/errors/user-not-found-error"
-import { DuplicatedUserError } from "../src/errors/duplicated-user-error"
+import { DuplicateUserError } from "../src/errors/duplicate-user-error"
 import { FakeUserRepo } from "./doubles/fake-user-repo"
 import { FakeBikeRepo } from "./doubles/fake-bike-repo"
 import { FakeRentRepo } from "./doubles/fake-rent-repo"
 import { UserRepo } from "../src/ports/user-repo"
 import { BikeRepo } from "../src/ports/bike-repo"
 import { RentRepo } from "../src/ports/rent-repo"
-import { UserNotRemoved } from "../src/errors/user-not-removed-error"
+import { UserHasOpenRentError } from "../src/errors/user-has-open-rent-error"
 
 
 let userRepo: UserRepo
@@ -83,13 +83,13 @@ describe('App', () => {
         await app.registerBike(bike)
         await app.rentBike(bike.id, user.email)
         await expect(app.rentBike(bike.id, user.email))
-              .rejects.toThrow(UnavailableBikeError)
+            .rejects.toThrow(UnavailableBikeError)
     })
 
     it('should throw user not found error when user is not found', async () => {
         const app = new App(userRepo, bikeRepo, rentRepo)
         await expect(app.findUser('fake@mail.com'))
-             .rejects.toThrow(UserNotFoundError)
+            .rejects.toThrow(UserNotFoundError)
     })
 
     it('should correctly authenticate user', async () => {
@@ -97,14 +97,14 @@ describe('App', () => {
         const user = new User('jose', 'jose@mail.com', '1234')
         await app.registerUser(user)
         await expect(app.authenticate('jose@mail.com', '1234'))
-              .resolves.toBeTruthy()
+            .resolves.toBeTruthy()
     })
 
     it('should throw duplicate user error when trying to register a duplicate user', async () => {
         const app = new App(userRepo, bikeRepo, rentRepo)
         const user = new User('jose', 'jose@mail.com', '1234')
         await app.registerUser(user)
-        await expect(app.registerUser(user)).rejects.toThrow(DuplicatedUserError)
+        await expect(app.registerUser(user)).rejects.toThrow(DuplicateUserError)
     })
 
     it('should correctly remove registered user', async () => {
@@ -113,27 +113,13 @@ describe('App', () => {
         await app.registerUser(user)
         await app.removeUser(user.email)
         await expect(app.findUser(user.email))
-              .rejects.toThrow(UserNotFoundError)
-        
+            .rejects.toThrow(UserNotFoundError)
     })
-
-    it('should throw UserNotRemoved error when removing user with open rent', async () => {
-        const app = new App(userRepo, bikeRepo, rentRepo)
-        const user = new User('jose', 'jose@mail.com', '1234')
-        const bike = new Bike('caloi mountainbike', 'mountain bike',
-        1234, 1234, 100.0, 'My bike', 5, [])
-
-        await app.registerUser(user)
-        await app.registerBike(bike)
-        await app.rentBike(bike.id, user.email)
-
-        await expect(app.removeUser(user.email)).rejects.toThrow(UserNotRemoved)
-    }) 
 
     it ('should throw user not found error when trying to remove an unregistered user', async () => {
         const app = new App(userRepo, bikeRepo, rentRepo)
         await expect(app.removeUser('fake@mail.com'))
-              .rejects.toThrow(UserNotFoundError)
+            .rejects.toThrow(UserNotFoundError)
     })
 
     it ('should correctly register user', async () => {
@@ -141,6 +127,20 @@ describe('App', () => {
         const user = new User('jose', 'jose@mail.com', '1234')
         await app.registerUser(user)
         await expect(app.findUser(user.email))
-              .resolves.toEqual(user)
+            .resolves.toEqual(user)
     })
+
+    it ('should not remove user with open rents', async () => {
+        const app = new App(userRepo, bikeRepo, rentRepo)
+        const user = new User('Jose', 'jose@mail.com', '1234')
+        await app.registerUser(user)
+        const bike = new Bike('caloi mountainbike', 'mountain bike',
+            1234, 1234, 100.0, 'My bike', 5, [])
+        await app.registerBike(bike)
+        await app.rentBike(bike.id, user.email)
+        await expect(app.removeUser(user.email))
+            .rejects.toThrow(UserHasOpenRentError)
+    })
+
+    
 })
